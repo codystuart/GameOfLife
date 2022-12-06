@@ -13,7 +13,8 @@ namespace StuartCodyGOL
     public partial class Form1 : Form
     {
         // The universe array
-        bool[,] universe = new bool[5, 5];
+        bool[,] universe = new bool[16, 16];
+        bool[,] scratchPad = new bool[16, 16];
 
         // Drawing colors
         Color gridColor = Color.Black;
@@ -25,6 +26,8 @@ namespace StuartCodyGOL
         // Generation count
         int generations = 0;
 
+
+
         public Form1()
         {
             InitializeComponent();
@@ -32,12 +35,53 @@ namespace StuartCodyGOL
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
-            timer.Enabled = true; // start timer running
+            timer.Enabled = false; // start timer running
         }
 
         // Calculate the next generation of cells
         private void NextGeneration()
         {
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    int count = CountNeighborsFinite(x, y);
+
+                    //apply rules                
+                    //check if cell is alive if it is make sure it has enough neighbors to live
+                    if (universe[x,y])
+                    {
+                        if(count < 2)
+                        {
+                            scratchPad[x, y] = false;
+                        }
+                        else if (count > 3)
+                        {
+                            scratchPad[x, y] = false;
+                        }
+                        else if(count ==2 || count == 3)
+                        {
+                            scratchPad[x, y] = true;
+                        }
+                    }
+                    else
+                    {
+                        if(count == 3)
+                        {
+                            scratchPad[x, y] = true;
+                        }
+                    }
+
+                    //Turn on or off in the scratchpad
+                    //scratchPad[x, y] = !scratchPad[x,y];
+                }
+            }
+
+            //copy what is in the scathcpad to the universe
+            //SwapBools(universe, scratchPad);
+            bool[,] temp = universe;
+            universe = scratchPad;
+            scratchPad = temp;
 
 
             // Increment generation count
@@ -45,6 +89,8 @@ namespace StuartCodyGOL
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+
+            graphicsPanel1.Invalidate();
         }
 
         // The event called by the timer every Interval milliseconds.
@@ -88,8 +134,25 @@ namespace StuartCodyGOL
 
                     // Outline the cell with a pen
                     e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+
+
+                    Font font = new Font("Arial", 20f);
+
+                    StringFormat stringFormat = new StringFormat();
+                    stringFormat.Alignment = StringAlignment.Center;
+                    stringFormat.LineAlignment = StringAlignment.Center;
+
+                    int neighbors = CountNeighborsFinite(x,y);
+
+                    if (neighbors != 0)
+                    {
+                        e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
+                    }
+
                 }
             }
+
+
 
             // Cleaning up pens and brushes
             gridPen.Dispose();
@@ -118,5 +181,107 @@ namespace StuartCodyGOL
                 graphicsPanel1.Invalidate();
             }
         }
+
+        private void graphicsPanel1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private int CountNeighborsFinite(int x, int y)
+        {
+            int count = 0;
+            int xLen = universe.GetLength(0);
+            int yLen = universe.GetLength(1);
+            for (int yOffset = -1; yOffset <= 1; yOffset++)
+            {
+                for (int xOffset = -1; xOffset <= 1; xOffset++)
+                {
+                    int xCheck = x + xOffset;
+                    int yCheck = y + yOffset;
+                    // if xOffset and yOffset are both equal to 0 then continue
+                    if (xOffset == 0 && yOffset == 0)
+                    {
+                        continue;
+                    }
+                    // if xCheck is less than 0 then continue
+                    if (xCheck < 0)
+                    { continue; }
+                    // if yCheck is less than 0 then continue
+                    if (yCheck < 0)
+                    { continue; }
+                    // if xCheck is greater than or equal too xLen then continue
+                    if (xCheck >= xLen)
+                    { continue; }
+                    // if yCheck is greater than or equal too yLen then continue
+                    if (yCheck >= yLen)
+                    { continue; }
+
+                    if (universe[xCheck, yCheck] == true) count++;
+                }
+            }
+            return count;
+        }
+
+        private int CountNeighborsToroidal(int x, int y)
+        {
+            int count = 0;
+            int xLen = universe.GetLength(0);
+            int yLen = universe.GetLength(1);
+            for (int yOffset = -1; yOffset <= 1; yOffset++)
+            {
+                for (int xOffset = -1; xOffset <= 1; xOffset++)
+                {
+                    int xCheck = x + xOffset;
+                    int yCheck = y + yOffset;
+                    // if xOffset and yOffset are both equal to 0 then continue
+                    // if xCheck is less than 0 then set to xLen - 1
+                    // if yCheck is less than 0 then set to yLen - 1
+                    // if xCheck is greater than or equal too xLen then set to 0
+                    // if yCheck is greater than or equal too yLen then set to 0
+
+                    if (universe[xCheck, yCheck] == true) count++;
+                }
+            }
+            return count;
+        }
+
+        private void SwapBools(bool[,] bool1, bool[,] bool2)
+        {
+            bool[,] temp = bool1;
+            bool1 = bool2;
+            bool2 = temp;
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = true;
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = false;
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            NextGeneration();
+        }
+
+        private void newToolStripButton_Click(object sender, EventArgs e)
+        {
+            generations = 0;
+            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            timer.Enabled=false;
+            Array.Clear(universe, 0, universe.Length);
+            Array.Clear(scratchPad, 0, scratchPad.Length);
+            graphicsPanel1.Invalidate();
+
+        }
+
     }
 }
