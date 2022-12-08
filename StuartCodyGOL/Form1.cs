@@ -70,7 +70,12 @@ namespace StuartCodyGOL
                         {
                             scratchPad[x, y] = true;
                         }
+                        else if (count != 3)
+                        {
+                            scratchPad[x, y] = false;
+                        }
                     }
+
 
                     //Turn on or off in the scratchpad
                     //scratchPad[x, y] = !scratchPad[x,y];
