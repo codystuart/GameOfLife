@@ -13,8 +13,8 @@ namespace StuartCodyGOL
     public partial class Form1 : Form
     {
         // The universe array
-        bool[,] universe = new bool[16, 16];
-        bool[,] scratchPad = new bool[16, 16];
+        bool[,] universe = new bool[5, 5];
+        bool[,] scratchPad = new bool[5, 5];
 
         // Drawing colors
         Color gridColor = Color.Black;
@@ -41,35 +41,44 @@ namespace StuartCodyGOL
         // Calculate the next generation of cells
         private void NextGeneration()
         {
+            //loop through 2d array left->right, and then top->bottom
             for (int y = 0; y < universe.GetLength(1); y++)
             {
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
-                    int count = CountNeighborsFinite(x, y);
+                    //get the neighbor count and assign it to a variable for use later
+                    int count = CountNeighborsToroidal(x, y);
 
                     //apply rules                
                     //check if cell is alive if it is make sure it has enough neighbors to live
+                    //this if check if the current cell (array index) is set to true or alive
                     if (universe[x,y])
                     {
+                        //check if there are less than two living neighbors, if so cell will be dead in next generation
                         if(count < 2)
                         {
                             scratchPad[x, y] = false;
                         }
+                        //check if there are more than 3 living neighbors, if so cell will be dead in the next generation
                         else if (count > 3)
                         {
                             scratchPad[x, y] = false;
                         }
+                        //check if the numbers of living numbers is equal to 2 or 3 if so the cell will live in the next generation
                         else if(count ==2 || count == 3)
                         {
                             scratchPad[x, y] = true;
                         }
                     }
+                    //using else here since the only other option to check after the rules for living cells is dead cells
                     else
                     {
+                        //if a dead cell is exactly 3 living neighbors it will then be alive in the next generation
                         if(count == 3)
                         {
                             scratchPad[x, y] = true;
                         }
+                        //dead cells with anything other than 3 neighbors will not be alive in the next generation
                         else if (count != 3)
                         {
                             scratchPad[x, y] = false;
@@ -95,6 +104,7 @@ namespace StuartCodyGOL
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
 
+            //force the form to be repainted
             graphicsPanel1.Invalidate();
         }
 
@@ -140,20 +150,20 @@ namespace StuartCodyGOL
                     // Outline the cell with a pen
                     e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
 
-
+                    //The following writes the neighbor count to the center of the cell
                     Font font = new Font("Arial", 20f);
 
                     StringFormat stringFormat = new StringFormat();
                     stringFormat.Alignment = StringAlignment.Center;
                     stringFormat.LineAlignment = StringAlignment.Center;
 
-                    int neighbors = CountNeighborsFinite(x,y);
+                    int neighbors = CountNeighborsToroidal(x,y);
 
                     if (neighbors != 0)
                     {
                         e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
                     }
-
+                    //End of writing neighbor count to the center of cells
                 }
             }
 
@@ -244,12 +254,33 @@ namespace StuartCodyGOL
                     int xCheck = x + xOffset;
                     int yCheck = y + yOffset;
                     // if xOffset and yOffset are both equal to 0 then continue
+                    if(xOffset == 0 && yOffset == 0)
+                    { continue; }
                     // if xCheck is less than 0 then set to xLen - 1
+                    if(xCheck < 0)
+                    { 
+                        xCheck = xLen - 1;
+                    }
                     // if yCheck is less than 0 then set to yLen - 1
+                    if (yCheck < 0)
+                    { 
+                        yCheck = yLen - 1;
+                    }
                     // if xCheck is greater than or equal too xLen then set to 0
+                    if (xCheck >= xLen)
+                    {
+                        xCheck = 0;
+                    }
                     // if yCheck is greater than or equal too yLen then set to 0
+                    if (yCheck >= 0)
+                    { 
+                        yCheck = 0;
+                    }
 
-                    if (universe[xCheck, yCheck] == true) count++;
+                    if (universe[xCheck, yCheck] == true)
+                    {
+                        count++;
+                    }
                 }
             }
             return count;
@@ -257,6 +288,7 @@ namespace StuartCodyGOL
 
         private void SwapBools(bool[,] bool1, bool[,] bool2)
         {
+            
             bool[,] temp = bool1;
             bool1 = bool2;
             bool2 = temp;
@@ -264,26 +296,35 @@ namespace StuartCodyGOL
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            //enable the timer so that the generations run continuosly
             timer.Enabled = true;
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
+            //disable the timer so that the user must advance the generations manually, this is how we pause the game
             timer.Enabled = false;
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
+            //call the NextGeneration method so we advance only once when the next button is clicked
             NextGeneration();
         }
 
         private void newToolStripButton_Click(object sender, EventArgs e)
         {
+            //set generations counter back to 0
             generations = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            //stop the timer so generations stop counting
             timer.Enabled=false;
+
+            //clear the arrays so we dont have false information in our new game
             Array.Clear(universe, 0, universe.Length);
             Array.Clear(scratchPad, 0, scratchPad.Length);
+
+            //force the form to be repainted
             graphicsPanel1.Invalidate();
 
         }
