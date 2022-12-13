@@ -47,7 +47,7 @@ namespace StuartCodyGOL
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
                     //get the neighbor count and assign it to a variable for use later
-                    int count = CountNeighborsToroidal(x, y);
+                    int count = CountNeighborsFinite(x, y);
 
                     //apply rules                
                     //check if cell is alive if it is make sure it has enough neighbors to live
@@ -157,7 +157,7 @@ namespace StuartCodyGOL
                     stringFormat.Alignment = StringAlignment.Center;
                     stringFormat.LineAlignment = StringAlignment.Center;
 
-                    int neighbors = CountNeighborsToroidal(x,y);
+                    int neighbors = CountNeighborsFinite(x,y);
 
                     if (neighbors != 0)
                     {
