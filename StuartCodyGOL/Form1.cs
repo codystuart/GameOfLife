@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
@@ -28,6 +29,7 @@ namespace StuartCodyGOL
         int generations = 0;
         int living = 0;
 
+        CheckState gridCheck;
 
         public Form1()
         {
@@ -346,6 +348,11 @@ namespace StuartCodyGOL
             Array.Clear(universe, 0, universe.Length);
             Array.Clear(scratchPad, 0, scratchPad.Length);
 
+            //Reset Colors
+            graphicsPanel1.BackColor = Color.White;
+            cellColor = Color.Gray;
+            gridColor = Color.Black;
+
             //force the form to be repainted
             graphicsPanel1.Invalidate();
 
@@ -407,6 +414,21 @@ namespace StuartCodyGOL
             }
 
 
+        }
+
+        private void backgroundToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            backgroundToolStripMenuItem_Click(sender, e);
+        }
+
+        private void cellToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            cellToolStripMenuItem_Click(sender, e);
+        }
+
+        private void gridToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            gridToolStripMenuItem_Click(sender, e);
         }
     }
 }
