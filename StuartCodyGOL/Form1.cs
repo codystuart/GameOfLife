@@ -729,5 +729,141 @@ namespace StuartCodyGOL
             //force windows to repaint
             graphicsPanel1.Invalidate();
         }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "All Files|*.*|Cells|*.cells";
+            sfd.FilterIndex = 2; sfd.DefaultExt = "cells";
+
+            if (DialogResult.OK == sfd.ShowDialog())
+            {
+                StreamWriter writer = new StreamWriter(sfd.FileName);
+
+                // Write any comments you want to include first.
+                // Prefix all comment strings with an exclamation point.
+                // Use WriteLine to write the strings to the file. 
+                // It appends a CRLF for you.
+                writer.WriteLine("!Name: Cells");
+
+                // Iterate through the universe one row at a time.
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    //Create a string to represent the current row.
+                    String currentRow = string.Empty;
+
+                    //Iterate through the current row one cell at a time.
+                    for (int x = 0; x < universe.GetLength(0); x++)
+                    {
+                        if (universe[x,y])
+                        {
+                            writer.Write(currentRow + 'O');
+
+                        }
+                        else if (!universe[x,y])
+                        {
+                            writer.Write(currentRow + '.');
+                        }
+                    }
+                    writer.WriteLine();
+                }
+
+                // After all rows and columns have been written then close the file.
+                writer.Close();
+            }
+        }
+
+        private void saveToolStripButton_Click(object sender, EventArgs e)
+        {
+            //Call this method because we dont want to write the same code twice
+            saveToolStripMenuItem_Click(sender, e);
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "All Files|*.*|Cells|*.cells";
+            ofd.FilterIndex = 2;
+
+            if (DialogResult.OK == ofd.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(ofd.FileName);
+
+                //create variables to calculate width and height of the data in the file
+                int MaxWidth = 0;
+                int MaxHeight = 0;
+
+                //Iterate through the file once to get its size
+                while (!reader.EndOfStream)
+                {
+                    //read one row at a time
+                    string row = reader.ReadLine();
+
+                    //if the row begins with a ! then it should be ignored
+                    if (row.StartsWith("!"))
+                    {
+                        continue;
+                    }
+                    // If the row is not a comment then it is a row of cells.
+                    // Increment the maxHeight variable for each row read.
+                    MaxHeight++;
+                    // Get the length of the current row string
+                    // and adjust the maxWidth variable if necessary.
+                    MaxWidth = row.Length;
+                }
+
+                //resize universe, and scratchPad arrays
+                universe = new bool[MaxWidth, MaxHeight];
+                scratchPad = new bool[MaxWidth, MaxHeight];
+
+                //reset the file pointer back to the beginning of the file
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                int yPos = 0;
+                //iterate through the file again, this time reading in the cells
+                while (!reader.EndOfStream)
+                {
+                    //read one row at a time
+                    String row = reader.ReadLine();
+
+                    //if the row begins with a !then it should be ignored
+                    if (row.StartsWith("!"))
+                    {
+                        continue;
+                    }
+                    
+                    // If the row is not a comment then 
+                    // it is a row of cells and needs to be iterated through.
+                    for (int xPos = 0; xPos < row.Length; xPos++)
+                    {
+                        
+                        // If row[xPos] is a 'O' (capital O) then
+                        // set the corresponding cell in the universe to alive.
+                        if (row[xPos] == 'O')
+                        {
+                            //cell is alive
+                            universe[xPos,yPos] = true;
+                        }
+                        else
+                        {
+                            //cell is dead
+                            universe[xPos,yPos] = false;
+
+                        }
+                        
+                    }
+                    yPos++;
+
+                }
+                reader.Close();
+                
+            }
+            graphicsPanel1.Invalidate();
+        }
+
+        private void openToolStripButton_Click(object sender, EventArgs e)
+        {
+            //call the following method because we don't want to write duplicate code
+            openToolStripMenuItem_Click(sender, e);
+        }
     }
 }
