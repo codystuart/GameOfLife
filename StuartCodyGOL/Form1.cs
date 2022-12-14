@@ -10,6 +10,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 
 namespace StuartCodyGOL
 {
@@ -521,6 +522,30 @@ namespace StuartCodyGOL
                 //Force windows to repaint form
                 graphicsPanel1.Invalidate();
             }
+        }
+
+        private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Random randTime = new Random((int)DateTime.Now.Ticks);
+
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    int randFromTime = randTime.Next(0, 3);
+
+                    if (randFromTime == 0)
+                    {
+                        universe[x, y] = true;
+                    }
+                    else
+                    {
+                        universe[x, y] = false;
+                    }
+                }
+            }
+            //Force windows to repaint form
+            graphicsPanel1.Invalidate();
         }
     }
 }
