@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Text;
@@ -14,9 +15,10 @@ namespace StuartCodyGOL
 {
     public partial class Form1 : Form
     {
+        
         // The universe array
-        bool[,] universe = new bool[5, 5];
-        bool[,] scratchPad = new bool[5, 5];
+        bool[,] universe = new bool[10, 10];
+        bool[,] scratchPad = new bool[10, 10];
 
         // Drawing colors
         Color gridColor = Color.Black;
@@ -29,7 +31,13 @@ namespace StuartCodyGOL
         int generations = 0;
         int living = 0;
 
-        CheckState gridCheck;
+        //store universe height/width
+        int gridHeight = 0;
+        int gridWidth = 0;
+        int seed = 0;
+
+        StreamWriter strW = new StreamWriter("seed.txt");
+        
 
         public Form1()
         {
@@ -68,7 +76,7 @@ namespace StuartCodyGOL
                             scratchPad[x, y] = false;
                         }
                         //check if the numbers of living numbers is equal to 2 or 3 if so the cell will live in the next generation
-                        else if(count ==2 || count == 3)
+                        else if(count == 2 || count == 3)
                         {
                             scratchPad[x, y] = true;
                         }
@@ -116,6 +124,8 @@ namespace StuartCodyGOL
                     }
                 }
             }
+
+            
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
@@ -186,7 +196,15 @@ namespace StuartCodyGOL
                 }
             }
 
+            // Update status strip timer interval
+            toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
 
+            // Update Height/Width status strips
+            toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
+            toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();
+
+            // Update seed status strip
+            toolStripStatusLabelSeed.Text = "Seed = " + seed.ToString();
 
             // Cleaning up pens and brushes
             gridPen.Dispose();
@@ -336,10 +354,12 @@ namespace StuartCodyGOL
             //set status tool strip items back to 0
             generations = 0;
             living = 0;
+            timer.Interval = 100;
 
-            //The following is needed to updated our form with the Zero'd values of the status tool strip items
+            //Update status strips to defaults
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
+            toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
 
             //stop the timer so generations stop counting
             timer.Enabled=false;
@@ -429,6 +449,78 @@ namespace StuartCodyGOL
         private void gridToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             gridToolStripMenuItem_Click(sender, e);
+        }
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModalDialog dlg = new ModalDialog();
+            //get timer setting for Settings dialog
+            dlg.SetTimerInterval(timer.Interval);
+
+            //Set Dialog box default values to current Height and Width
+            dlg.SetGridHeight(universe.GetLength(0));
+            dlg.SetGridWidth(universe.GetLength(1));
+
+            if(DialogResult.OK == dlg.ShowDialog())
+            {
+                //Update Status strip for Timer
+                timer.Interval = dlg.GetTimerInterval();
+                toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
+
+                //update grid height/width
+                gridHeight = dlg.GetGridHeight();
+                gridWidth = dlg.GetGridWidth();
+                dlg.SetGridHeight(gridHeight);
+                dlg.SetGridWidth(gridWidth);
+
+                bool[,] universe = new bool[gridHeight, gridWidth];
+                bool[,] scratchPad = new bool[gridHeight, gridWidth];
+
+                toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
+                toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();
+
+                //Force Windows to repaint
+                graphicsPanel1.Invalidate();
+            }
+        }
+
+        private void fromSeedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SeedDialog sdlg = new SeedDialog();
+
+            //get current seed
+            sdlg.SetSeed(seed);
+
+            if(DialogResult.OK == sdlg.ShowDialog())
+            {
+                //get current set seed
+                seed = sdlg.GetSeed();
+                //set current set speed to counter in Dialog
+                sdlg.SetSeed(seed);
+
+                //Create our random number object and tie it to our seed
+                Random rand = new Random(seed);
+   
+                //iterate through the array
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    for (int x = 0; x < universe.GetLength(0); x++)
+                    {
+                        int randFromSeed = rand.Next(0, 3);
+
+                        if (randFromSeed == 0)
+                        {
+                            universe[x, y] = true;
+                        }
+                        else
+                        {
+                            universe[x, y] = false;
+                        }
+                    }
+                }
+                //Force windows to repaint form
+                graphicsPanel1.Invalidate();
+            }
         }
     }
 }

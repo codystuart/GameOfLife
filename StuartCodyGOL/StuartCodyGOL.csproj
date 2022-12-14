@@ -55,11 +55,26 @@
     <Compile Include="GraphicsPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ModalDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModalDialog.Designer.cs">
+      <DependentUpon>ModalDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeedDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeedDialog.Designer.cs">
+      <DependentUpon>SeedDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModalDialog.resx">
+      <DependentUpon>ModalDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -71,6 +86,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SeedDialog.resx">
+      <DependentUpon>SeedDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
