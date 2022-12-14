@@ -37,6 +37,12 @@ namespace StuartCodyGOL
         int gridWidth = 0;
         int seed = 0;
 
+        //provide bools here for checkboxes
+        bool neighborsCheckBox = true;
+        bool gridCheckBox = true;
+        bool neighborCntShow = true;
+        bool gridShow = true;
+
         StreamWriter strW = new StreamWriter("seed.txt");
         
 
@@ -59,7 +65,7 @@ namespace StuartCodyGOL
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
                     //get the neighbor count and assign it to a variable for use later
-                    int count = CountNeighborsFinite(x, y);
+                    int count = CountNeighborsToroidal(x, y);
 
                     //apply rules                
                     //check if cell is alive if it is make sure it has enough neighbors to live
@@ -177,23 +183,29 @@ namespace StuartCodyGOL
                         e.Graphics.FillRectangle(cellBrush, cellRect);
                     }
 
-                    // Outline the cell with a pen
-                    e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
-
-                    //The following writes the neighbor count to the center of the cell
-                    Font font = new Font("Arial", 20f);
-
-                    StringFormat stringFormat = new StringFormat();
-                    stringFormat.Alignment = StringAlignment.Center;
-                    stringFormat.LineAlignment = StringAlignment.Center;
-
-                    int neighbors = CountNeighborsFinite(x,y);
-
-                    if (neighbors != 0)
+                    if (gridShow)
                     {
-                        e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
+                        // Outline the cell with a pen
+                        e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
                     }
-                    //End of writing neighbor count to the center of cells
+                    //Make sure bool is true for showing neighbor counts before drawing
+                    if (neighborCntShow)
+                    {
+                        //The following writes the neighbor count to the center of the cell
+                        Font font = new Font("Arial", 20f);
+
+                        StringFormat stringFormat = new StringFormat();
+                        stringFormat.Alignment = StringAlignment.Center;
+                        stringFormat.LineAlignment = StringAlignment.Center;
+
+                        int neighbors = CountNeighborsToroidal(x, y);
+
+                        if (neighbors != 0)
+                        {
+                            e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
+                        }
+                        //End of writing neighbor count to the center of cells
+                    }
                 }
             }
 
@@ -310,7 +322,7 @@ namespace StuartCodyGOL
                         xCheck = 0;
                     }
                     // if yCheck is greater than or equal too yLen then set to 0
-                    if (yCheck >= 0)
+                    if (yCheck >= yLen)
                     { 
                         yCheck = 0;
                     }
@@ -528,6 +540,8 @@ namespace StuartCodyGOL
         {
             Random randTime = new Random((int)DateTime.Now.Ticks);
 
+
+            //iterate through the array and generate a number from 0-2 (inclusive), if it is 0 make the cell alive, otherwise it stays dead
             for (int y = 0; y < universe.GetLength(1); y++)
             {
                 for (int x = 0; x < universe.GetLength(0); x++)
@@ -545,6 +559,74 @@ namespace StuartCodyGOL
                 }
             }
             //Force windows to repaint form
+            graphicsPanel1.Invalidate();
+        }
+
+        private void neighborCountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            neighborsCheckBox = !neighborsCheckBox;
+            if (neighborsCheckBox == true)
+            {
+                neighborCountToolStripMenuItem1.Checked = true;
+                neighborCountToolStripMenuItem1.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                neighborCountToolStripMenuItem1.Checked = false;
+                neighborCountToolStripMenuItem1.CheckState = CheckState.Unchecked;
+            }
+            neighborCntShow = !neighborCntShow;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void gridToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            gridCheckBox = !gridCheckBox;
+            if (gridCheckBox == true)
+            {
+                gridToolStripMenuItem3.Checked = true;
+                gridToolStripMenuItem3.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                gridToolStripMenuItem3.Checked = false;
+                gridToolStripMenuItem3.CheckState = CheckState.Unchecked;
+            }
+            gridShow = !gridShow;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void neighborCountToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            neighborsCheckBox = !neighborsCheckBox;
+            if (neighborsCheckBox == true)
+            {
+                neighborCountToolStripMenuItem.Checked = true;
+                neighborCountToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                neighborCountToolStripMenuItem.Checked = false;
+                neighborCountToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
+            neighborCntShow = !neighborCntShow;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void gridToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            gridCheckBox = !gridCheckBox;
+            if (gridCheckBox == true)
+            {
+                gridToolStripMenuItem2.Checked = true;
+                gridToolStripMenuItem2.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                gridToolStripMenuItem2.Checked = false;
+                gridToolStripMenuItem2.CheckState = CheckState.Unchecked;
+            }
+            gridShow = !gridShow;
             graphicsPanel1.Invalidate();
         }
     }
