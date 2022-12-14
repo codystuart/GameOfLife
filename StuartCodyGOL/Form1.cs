@@ -470,9 +470,12 @@ namespace StuartCodyGOL
             //get timer setting for Settings dialog
             dlg.SetTimerInterval(timer.Interval);
 
+            gridHeight = universe.GetLength(0);
+            gridWidth = universe.GetLength(1);
+
             //Set Dialog box default values to current Height and Width
-            dlg.SetGridHeight(universe.GetLength(0));
-            dlg.SetGridWidth(universe.GetLength(1));
+            dlg.GridHeight = gridHeight;
+            dlg.GridWidth = gridWidth;
 
             if(DialogResult.OK == dlg.ShowDialog())
             {
@@ -481,13 +484,14 @@ namespace StuartCodyGOL
                 toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
 
                 //update grid height/width
-                gridHeight = dlg.GetGridHeight();
-                gridWidth = dlg.GetGridWidth();
-                dlg.SetGridHeight(gridHeight);
-                dlg.SetGridWidth(gridWidth);
+                gridHeight = dlg.GridHeight;
+                gridWidth = dlg.GridWidth;
 
-                bool[,] universe = new bool[gridHeight, gridWidth];
-                bool[,] scratchPad = new bool[gridHeight, gridWidth];
+                bool[,] universeTemp = new bool[gridHeight, gridWidth];
+                bool[,] scratchPadTemp = new bool[gridHeight, gridWidth];
+
+                universe = universeTemp;
+                scratchPad = scratchPadTemp;
 
                 toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
                 toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();

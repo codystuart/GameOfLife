@@ -18,33 +18,41 @@ namespace StuartCodyGOL
             InitializeComponent();
         }
 
+        //get and set Height of Grid
+        public int GridHeight
+        {
+            get
+            {
+                return (int)numericUpDownGridHeight.Value;
+            }
+            set 
+            {
+                numericUpDownGridHeight.Value = value;
+            }
+        }
+
+        //Get and set Width of grid
+        public int GridWidth
+        {
+            get
+            {
+                return(int)numericUpDownGridWidth.Value;
+            }
+            set
+            {
+                numericUpDownGridWidth.Value = value;
+            }
+        }
+
+        //get and set Timer Value
         public int GetTimerInterval()
-        { 
-            return (int)numericUpDown1.Value; 
+        {
+            return (int)numericUpDown1.Value;
         }
 
-        public int GetGridHeight()
-        {
-            return (int)numericUpDownGridHeight.Value;
-        }
-        public int GetGridWidth() 
-        {
-            return (int)numericUpDownGridWidth.Value;
-        }
-
-        public void SetTimerInterval(int interval) 
+        public void SetTimerInterval(int interval)
         {
             numericUpDown1.Value = interval;
-        }
-
-        public void SetGridHeight(int height) 
-        {
-            numericUpDownGridHeight.Value = height;
-        }
-
-        public void SetGridWidth(int gridWidth)
-        {
-            numericUpDownGridWidth.Value = gridWidth;
         }
     }
 }
