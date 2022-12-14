@@ -45,7 +45,7 @@ namespace StuartCodyGOL
         bool toroidalCount = true;
         bool finiteCount = false;
 
-        StreamWriter strW = new StreamWriter("seed.txt");
+        //StreamWriter strW = new StreamWriter("seed.txt");
         
 
         public Form1()
@@ -66,8 +66,10 @@ namespace StuartCodyGOL
             {
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
+                    //initialize count outside of if so it is within scope
                     int count = 0;
-                    //get the neighbor count and assign it to a variable for use later
+
+                    //get the neighbor count and assign it to a variable
                     if (toroidalCount)
                     {
                         count = CountNeighborsToroidal(x, y);
@@ -76,7 +78,6 @@ namespace StuartCodyGOL
                     {
                         count = CountNeighborsFinite(x, y);
                     }
-
 
                     //apply rules                
                     //check if cell is alive if it is make sure it has enough neighbors to live
@@ -113,10 +114,6 @@ namespace StuartCodyGOL
                             scratchPad[x, y] = false;
                         }
                     }
-
-
-                    //Turn on or off in the scratchpad
-                    //scratchPad[x, y] = !scratchPad[x,y];
                 }
             }
 
@@ -194,6 +191,7 @@ namespace StuartCodyGOL
                         e.Graphics.FillRectangle(cellBrush, cellRect);
                     }
 
+                    //Make sure bool is true for showing grid before drawing
                     if (gridShow)
                     {
                         // Outline the cell with a pen
@@ -209,17 +207,19 @@ namespace StuartCodyGOL
                         stringFormat.Alignment = StringAlignment.Center;
                         stringFormat.LineAlignment = StringAlignment.Center;
 
+                        //initialize neighbors outside of if so it isnt out of scope
                         int neighbors = 0;
 
-                        if (toroidalCount)
+                        if (toroidalCount) // = true
                         {
                             neighbors = CountNeighborsToroidal(x, y);
                         }
-                        else if (finiteCount)
+                        else if (finiteCount) // = true
                         {
                             neighbors = CountNeighborsFinite(x, y);
                         }
 
+                        //only draw neighbor count if there are greater than zero neighbors
                         if (neighbors != 0)
                         {
                             e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
@@ -265,11 +265,6 @@ namespace StuartCodyGOL
                 // Tell Windows you need to repaint
                 graphicsPanel1.Invalidate();
             }
-        }
-
-        private void graphicsPanel1_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -356,14 +351,6 @@ namespace StuartCodyGOL
             return count;
         }
 
-        private void SwapBools(bool[,] bool1, bool[,] bool2)
-        {
-            
-            bool[,] temp = bool1;
-            bool1 = bool2;
-            bool2 = temp;
-        }
-
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             //enable the timer so that the generations run continuosly
@@ -425,6 +412,7 @@ namespace StuartCodyGOL
             {
                 graphicsPanel1.BackColor = clrDlg.Color;
 
+                //Force windows to repaint
                 graphicsPanel1.Invalidate();
             }
 
@@ -471,25 +459,31 @@ namespace StuartCodyGOL
 
         private void backgroundToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //call the following method which does exactly what we need here so we arent writing code twice
             backgroundToolStripMenuItem_Click(sender, e);
         }
 
         private void cellToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //call the following method which does exactly what we need here so we arent writing code twice
             cellToolStripMenuItem_Click(sender, e);
         }
 
         private void gridToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //call the following method which does exactly what we need here so we arent writing code twice
             gridToolStripMenuItem_Click(sender, e);
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //instantiate an object to utilize modal dialog class
             ModalDialog dlg = new ModalDialog();
+
             //get timer setting for Settings dialog
             dlg.SetTimerInterval(timer.Interval);
 
+            //Set height and width using array length
             gridHeight = universe.GetLength(0);
             gridWidth = universe.GetLength(1);
 
@@ -507,12 +501,15 @@ namespace StuartCodyGOL
                 gridHeight = dlg.GridHeight;
                 gridWidth = dlg.GridWidth;
 
+                //create new temp arrays to overwrite and resize 
                 bool[,] universeTemp = new bool[gridHeight, gridWidth];
                 bool[,] scratchPadTemp = new bool[gridHeight, gridWidth];
 
+                //set temps = actual arrays so they are resized
                 universe = universeTemp;
                 scratchPad = scratchPadTemp;
 
+                //update status strip with new height/width
                 toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
                 toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();
 
@@ -523,10 +520,12 @@ namespace StuartCodyGOL
 
         private void fromSeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //instantiate Seed dialog object so we can use the class
             SeedDialog sdlg = new SeedDialog();
 
             //get current seed
             sdlg.SetSeed(seed);
+
 
             if(DialogResult.OK == sdlg.ShowDialog())
             {
@@ -537,14 +536,15 @@ namespace StuartCodyGOL
 
                 //Create our random number object and tie it to our seed
                 Random rand = new Random(seed);
-   
-                //iterate through the array
+
+                //iterate through the array and generate a number from 0-2 (inclusive), if it is 0 make the cell alive, otherwise it stays dead
                 for (int y = 0; y < universe.GetLength(1); y++)
                 {
                     for (int x = 0; x < universe.GetLength(0); x++)
                     {
                         int randFromSeed = rand.Next(0, 3);
 
+                        //if randomly generated number is equal to zero cell is alive
                         if (randFromSeed == 0)
                         {
                             universe[x, y] = true;
@@ -562,6 +562,7 @@ namespace StuartCodyGOL
 
         private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //get random numbers using time
             Random randTime = new Random((int)DateTime.Now.Ticks);
 
 
@@ -588,9 +589,13 @@ namespace StuartCodyGOL
 
         private void neighborCountToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             neighborsCheckBox = !neighborsCheckBox;
+
+            //we want to make sure context menu matches the tool strip menu
             if (neighborsCheckBox == true)
             {
+                //we want to make sure context menu matches the tool strip menu
                 neighborCountToolStripMenuItem1.Checked = true;
                 neighborCountToolStripMenuItem1.CheckState = CheckState.Checked;
             }
@@ -599,13 +604,20 @@ namespace StuartCodyGOL
                 neighborCountToolStripMenuItem1.Checked = false;
                 neighborCountToolStripMenuItem1.CheckState = CheckState.Unchecked;
             }
+
+            //toggle if neighbor count is showing
             neighborCntShow = !neighborCntShow;
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
         private void gridToolStripMenuItem2_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             gridCheckBox = !gridCheckBox;
+
+            //we want to make sure context menu matches the tool strip menu
             if (gridCheckBox == true)
             {
                 gridToolStripMenuItem3.Checked = true;
@@ -616,13 +628,20 @@ namespace StuartCodyGOL
                 gridToolStripMenuItem3.Checked = false;
                 gridToolStripMenuItem3.CheckState = CheckState.Unchecked;
             }
+
+            //toggle if grid is showing 
             gridShow = !gridShow;
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
         private void neighborCountToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             neighborsCheckBox = !neighborsCheckBox;
+
+            //we want to make sure context menu matches the tool strip menu
             if (neighborsCheckBox == true)
             {
                 neighborCountToolStripMenuItem.Checked = true;
@@ -633,13 +652,20 @@ namespace StuartCodyGOL
                 neighborCountToolStripMenuItem.Checked = false;
                 neighborCountToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
+
+            //toggle if showing neighbor count or not
             neighborCntShow = !neighborCntShow;
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
         private void gridToolStripMenuItem3_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             gridCheckBox = !gridCheckBox;
+
+            //we want to make sure context menu matches the tool strip menu
             if (gridCheckBox == true)
             {
                 gridToolStripMenuItem2.Checked = true;
@@ -650,13 +676,20 @@ namespace StuartCodyGOL
                 gridToolStripMenuItem2.Checked = false;
                 gridToolStripMenuItem2.CheckState = CheckState.Unchecked;
             }
+
+            //toggle if showing grid or not
             gridShow = !gridShow;
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
         private void toroidalToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             toroidalCount = !toroidalCount;
+
+            //Check if toroidal is true or false and set finite to the opposite
             if (toroidalCount == true)
             {
                 finiteToolStripMenuItem.Checked = false;
@@ -669,12 +702,17 @@ namespace StuartCodyGOL
                 finiteToolStripMenuItem.CheckState = CheckState.Checked;
                 finiteCount = true;
             }
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
         private void finiteToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //flip checkbox setting
             finiteCount = !finiteCount;
+
+            //check if finite is true or false and set toroidal to the opposite
             if (finiteCount == true)
             {
                 toroidalToolStripMenuItem.Checked = false;
@@ -687,6 +725,8 @@ namespace StuartCodyGOL
                 toroidalToolStripMenuItem.CheckState = CheckState.Checked;
                 finiteCount = true;
             }
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
     }

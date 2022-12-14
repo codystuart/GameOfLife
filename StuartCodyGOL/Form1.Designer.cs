@@ -566,7 +566,6 @@
             this.graphicsPanel1.Name = "graphicsPanel1";
             this.graphicsPanel1.Size = new System.Drawing.Size(573, 274);
             this.graphicsPanel1.TabIndex = 3;
-            this.graphicsPanel1.Click += new System.EventHandler(this.graphicsPanel1_Click);
             this.graphicsPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.graphicsPanel1_Paint);
             this.graphicsPanel1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.graphicsPanel1_MouseClick);
             // 
