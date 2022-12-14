@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -330,11 +331,14 @@ namespace StuartCodyGOL
 
         private void newToolStripButton_Click(object sender, EventArgs e)
         {
-            //set generations counter back to 0
+            //set status tool strip items back to 0
             generations = 0;
             living = 0;
+
+            //The following is needed to updated our form with the Zero'd values of the status tool strip items
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
+
             //stop the timer so generations stop counting
             timer.Enabled=false;
 
@@ -347,5 +351,62 @@ namespace StuartCodyGOL
 
         }
 
+        private void backgroundToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //new a color dialog object so we can utilize it
+            ColorDialog clrDlg = new ColorDialog();
+
+            //get current background color
+            Color bgColor = graphicsPanel1.BackColor;
+            clrDlg.Color = bgColor;
+
+            //use the following to display the color picker dialog
+            if (DialogResult.OK == clrDlg.ShowDialog())
+            {
+                graphicsPanel1.BackColor = clrDlg.Color;
+
+                graphicsPanel1.Invalidate();
+            }
+
+            
+        }
+
+        private void cellToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //new a color dialog object so we can utilize it
+            ColorDialog clrDlg = new ColorDialog();
+
+            //get current cell color
+            clrDlg.Color = cellColor;
+
+            //use the following to actually display the color picker dialog
+            if (DialogResult.OK == clrDlg.ShowDialog())
+            {
+                //set cellColor to user's choice
+                cellColor = clrDlg.Color;
+
+                //Force windows to repaint
+                graphicsPanel1.Invalidate();
+            }
+        }
+
+        private void gridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //new a color dialog object so we can utilize it
+            ColorDialog clrDlg = new ColorDialog();
+
+            clrDlg.Color = gridColor;
+
+            //use the following to actually display the color picker dialog
+            if (DialogResult.OK == clrDlg.ShowDialog())
+            {
+                gridColor = clrDlg.Color;
+                
+                //Force windows to repaint
+                graphicsPanel1.Invalidate();
+            }
+
+
+        }
     }
 }
