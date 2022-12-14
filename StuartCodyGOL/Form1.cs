@@ -25,7 +25,7 @@ namespace StuartCodyGOL
 
         // Generation count
         int generations = 0;
-
+        int living = 0;
 
 
         public Form1()
@@ -101,8 +101,24 @@ namespace StuartCodyGOL
             // Increment generation count
             generations++;
 
+            // Get count of living cells
+            living = 0;
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    if (universe[x,y] == true)
+                    {
+                        living++;
+                    }
+                }
+            }
+
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+
+            // Update status strip Living Cells
+            toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
 
             //force the form to be repainted
             graphicsPanel1.Invalidate();
@@ -316,7 +332,9 @@ namespace StuartCodyGOL
         {
             //set generations counter back to 0
             generations = 0;
+            living = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
             //stop the timer so generations stop counting
             timer.Enabled=false;
 
