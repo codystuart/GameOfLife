@@ -42,6 +42,8 @@ namespace StuartCodyGOL
         bool gridCheckBox = true;
         bool neighborCntShow = true;
         bool gridShow = true;
+        bool toroidalCount = true;
+        bool finiteCount = false;
 
         StreamWriter strW = new StreamWriter("seed.txt");
         
@@ -64,8 +66,17 @@ namespace StuartCodyGOL
             {
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
+                    int count = 0;
                     //get the neighbor count and assign it to a variable for use later
-                    int count = CountNeighborsToroidal(x, y);
+                    if (toroidalCount)
+                    {
+                        count = CountNeighborsToroidal(x, y);
+                    }
+                    else if (finiteCount)
+                    {
+                        count = CountNeighborsFinite(x, y);
+                    }
+
 
                     //apply rules                
                     //check if cell is alive if it is make sure it has enough neighbors to live
@@ -198,7 +209,16 @@ namespace StuartCodyGOL
                         stringFormat.Alignment = StringAlignment.Center;
                         stringFormat.LineAlignment = StringAlignment.Center;
 
-                        int neighbors = CountNeighborsToroidal(x, y);
+                        int neighbors = 0;
+
+                        if (toroidalCount)
+                        {
+                            neighbors = CountNeighborsToroidal(x, y);
+                        }
+                        else if (finiteCount)
+                        {
+                            neighbors = CountNeighborsFinite(x, y);
+                        }
 
                         if (neighbors != 0)
                         {
@@ -631,6 +651,42 @@ namespace StuartCodyGOL
                 gridToolStripMenuItem2.CheckState = CheckState.Unchecked;
             }
             gridShow = !gridShow;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void toroidalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toroidalCount = !toroidalCount;
+            if (toroidalCount == true)
+            {
+                finiteToolStripMenuItem.Checked = false;
+                finiteToolStripMenuItem.CheckState = CheckState.Unchecked;
+                finiteCount = false;
+            }
+            else
+            {
+                finiteToolStripMenuItem.Checked = true;
+                finiteToolStripMenuItem.CheckState = CheckState.Checked;
+                finiteCount = true;
+            }
+            graphicsPanel1.Invalidate();
+        }
+
+        private void finiteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            finiteCount = !finiteCount;
+            if (finiteCount == true)
+            {
+                toroidalToolStripMenuItem.Checked = false;
+                toroidalToolStripMenuItem.CheckState = CheckState.Unchecked;
+                toroidalCount = false;
+            }
+            else
+            {
+                toroidalToolStripMenuItem.Checked = true;
+                toroidalToolStripMenuItem.CheckState = CheckState.Checked;
+                finiteCount = true;
+            }
             graphicsPanel1.Invalidate();
         }
     }
