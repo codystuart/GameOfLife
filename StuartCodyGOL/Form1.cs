@@ -44,6 +44,7 @@ namespace StuartCodyGOL
         bool gridShow = true;
         bool toroidalCount = true;
         bool finiteCount = false;
+        bool hudShow = true;
 
         //StreamWriter strW = new StreamWriter("seed.txt");
         
@@ -225,6 +226,33 @@ namespace StuartCodyGOL
                             e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
                         }
                         //End of writing neighbor count to the center of cells
+                    if (hudShow)
+                        {
+                            font = new Font("Arial", 12f);
+                            //The following draws the HUD
+                            //stringFormat.Alignment = StringAlignment.Far;
+                            //stringFormat.LineAlignment = StringAlignment.Near;
+
+                            //determine how we are counting neighbors
+                            string countType = string.Empty;
+                            if (toroidalCount)
+                            {
+                                countType = "Toroidal";
+                            }
+                            else
+                            {
+                                countType = "Finite";
+                            }
+
+                            //get height and width
+                            gridWidth = universe.GetLength(0);
+                            gridHeight = universe.GetLength(1);
+
+                            PointF hudPf = new PointF();
+                            e.Graphics.DrawString("Generation: " + generations + "\nLiving: " + living + "\nBoundary: " + countType + "\nUniverse Size: " + gridHeight + ", " + gridWidth, font, Brushes.DarkRed, hudPf);
+                        }
+
+
                     }
                 }
             }
@@ -233,8 +261,8 @@ namespace StuartCodyGOL
             toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
 
             // Update Height/Width status strips
-            toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
-            toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();
+            toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(1).ToString();
+            toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(0).ToString();
 
             // Update seed status strip
             toolStripStatusLabelSeed.Text = "Seed = " + seed.ToString();
@@ -382,7 +410,7 @@ namespace StuartCodyGOL
             toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
 
             //stop the timer so generations stop counting
-            timer.Enabled=false;
+            timer.Enabled = false;
 
             //clear the arrays so we dont have false information in our new game
             Array.Clear(universe, 0, universe.Length);
@@ -484,8 +512,8 @@ namespace StuartCodyGOL
             dlg.SetTimerInterval(timer.Interval);
 
             //Set height and width using array length
-            gridHeight = universe.GetLength(0);
-            gridWidth = universe.GetLength(1);
+            gridHeight = universe.GetLength(1);
+            gridWidth = universe.GetLength(0);
 
             //Set Dialog box default values to current Height and Width
             dlg.GridHeight = gridHeight;
@@ -502,16 +530,16 @@ namespace StuartCodyGOL
                 gridWidth = dlg.GridWidth;
 
                 //create new temp arrays to overwrite and resize 
-                bool[,] universeTemp = new bool[gridHeight, gridWidth];
-                bool[,] scratchPadTemp = new bool[gridHeight, gridWidth];
+                bool[,] universeTemp = new bool[gridWidth, gridHeight];
+                bool[,] scratchPadTemp = new bool[gridWidth, gridHeight];
 
                 //set temps = actual arrays so they are resized
                 universe = universeTemp;
                 scratchPad = scratchPadTemp;
 
                 //update status strip with new height/width
-                toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(0).ToString();
-                toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(1).ToString();
+                toolStripStatusLabelHeight.Text = "Grid Height = " + universe.GetLength(1).ToString();
+                toolStripStatusLabelWidth.Text = "Grid Width = " + universe.GetLength(0).ToString();
 
                 //Force Windows to repaint
                 graphicsPanel1.Invalidate();
@@ -555,6 +583,23 @@ namespace StuartCodyGOL
                         }
                     }
                 }
+
+                //get living cells count
+                living = 0;
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    for (int x = 0; x < universe.GetLength(0); x++)
+                    {
+                        if (universe[x, y] == true)
+                        {
+                            living++;
+                        }
+                    }
+                }
+
+                //update living cells count status strip
+                toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
+
                 //Force windows to repaint form
                 graphicsPanel1.Invalidate();
             }
@@ -583,7 +628,56 @@ namespace StuartCodyGOL
                     }
                 }
             }
+
+            //get living cells count
+            living = 0;
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    if (universe[x, y] == true)
+                    {
+                        living++;
+                    }
+                }
+            }
+
+            //update living cells count status strip
+            toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
+
             //Force windows to repaint form
+            graphicsPanel1.Invalidate();
+        }
+
+        private void hUDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            hudShow = !hudShow;
+            if(hudShow)
+            {
+                hUDToolStripMenuItem1.Checked = true;
+                hUDToolStripMenuItem1.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                hUDToolStripMenuItem1.Checked = false;
+                hUDToolStripMenuItem1.CheckState = CheckState.Unchecked;
+            }
+            graphicsPanel1.Invalidate();
+        }
+
+        private void hUDToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            hudShow = !hudShow;
+            if (hudShow)
+            {
+                hUDToolStripMenuItem.Checked = true;
+                hUDToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                hUDToolStripMenuItem.Checked = false;
+                hUDToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
             graphicsPanel1.Invalidate();
         }
 
@@ -857,6 +951,8 @@ namespace StuartCodyGOL
                 reader.Close();
                 
             }
+
+            //force windows to repaint
             graphicsPanel1.Invalidate();
         }
 
@@ -865,5 +961,7 @@ namespace StuartCodyGOL
             //call the following method because we don't want to write duplicate code
             openToolStripMenuItem_Click(sender, e);
         }
+
+
     }
 }
