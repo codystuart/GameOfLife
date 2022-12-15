@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StuartCodyGOL.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,8 +19,8 @@ namespace StuartCodyGOL
     {
         
         // The universe array
-        bool[,] universe = new bool[10, 10];
-        bool[,] scratchPad = new bool[10, 10];
+        bool[,] universe = new bool[Properties.Settings.Default.UniverseWidth, Properties.Settings.Default.UniverseHeight];
+        bool[,] scratchPad = new bool[Properties.Settings.Default.UniverseWidth, Properties.Settings.Default.UniverseHeight];
 
         // Drawing colors
         Color gridColor = Color.Black;
@@ -44,7 +45,7 @@ namespace StuartCodyGOL
         bool gridShow = true;
         bool toroidalCount = true;
         bool finiteCount = false;
-        bool hudShow = true;
+        bool hudShow = Properties.Settings.Default.HUD;
 
         //StreamWriter strW = new StreamWriter("seed.txt");
         
@@ -54,9 +55,14 @@ namespace StuartCodyGOL
             InitializeComponent();
 
             // Setup the timer
-            timer.Interval = 100; // milliseconds
+            timer.Interval = Properties.Settings.Default.Timer; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = false; // start timer running
+
+            graphicsPanel1.BackColor = Properties.Settings.Default.PanelColor;
+            cellColor = Properties.Settings.Default.CellColor;
+            gridColor = Properties.Settings.Default.GridColor;
+           
         }
 
         // Calculate the next generation of cells
@@ -160,7 +166,7 @@ namespace StuartCodyGOL
         }
 
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e)
-        {
+        { 
             // Calculate the width and height of each cell in pixels
             // CELL WIDTH = WINDOW WIDTH / NUMBER OF CELLS IN X
             int cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
@@ -254,6 +260,7 @@ namespace StuartCodyGOL
 
 
                     }
+                    
                 }
             }
 
@@ -266,6 +273,15 @@ namespace StuartCodyGOL
 
             // Update seed status strip
             toolStripStatusLabelSeed.Text = "Seed = " + seed.ToString();
+
+            //Make check box match saved hud show bool
+            if(!hudShow)
+            {
+                hUDToolStripMenuItem.Checked = false;
+                hUDToolStripMenuItem.CheckState = CheckState.Unchecked;
+                hUDToolStripMenuItem1.Checked = false;
+                hUDToolStripMenuItem1.CheckState = CheckState.Unchecked;
+            }
 
             // Cleaning up pens and brushes
             gridPen.Dispose();
@@ -408,6 +424,7 @@ namespace StuartCodyGOL
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
             toolStripStatusLabelLiving.Text = "Living = " + living.ToString();
             toolStripStatusLabelTimer.Text = "Timer = " + timer.Interval.ToString();
+            toolStripStatusLabelSeed.Text = "Seed = " + seed.ToString();
 
             //stop the timer so generations stop counting
             timer.Enabled = false;
@@ -962,6 +979,54 @@ namespace StuartCodyGOL
             openToolStripMenuItem_Click(sender, e);
         }
 
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //update settings when program is closed, so when program is reopend changes are still there
+            Properties.Settings.Default.PanelColor = graphicsPanel1.BackColor;
+            Properties.Settings.Default.CellColor = cellColor;
+            Properties.Settings.Default.GridColor = gridColor;
+            Properties.Settings.Default.UniverseWidth = universe.GetLength(0);
+            Properties.Settings.Default.UniverseHeight = universe.GetLength(1);
+            Properties.Settings.Default.Timer = timer.Interval;
+            Properties.Settings.Default.HUD = hudShow;
+            
 
+            Properties.Settings.Default.Save();
+        }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Reset application colors
+            graphicsPanel1.BackColor = Color.White;
+            cellColor = Color.Gray;
+            gridColor = Color.Black;
+            
+            //resize universes
+            universe = new bool[10,10];
+            scratchPad = new bool[10, 10];
+
+            timer.Interval = 100;
+
+            hudShow = true;
+
+            graphicsPanel1.Invalidate();
+        }
+
+        private void revertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            graphicsPanel1.BackColor = Properties.Settings.Default.PanelColor;
+            cellColor = Properties.Settings.Default.CellColor;
+            gridColor = Properties.Settings.Default.GridColor;
+
+            //resize universes
+            universe = new bool[Properties.Settings.Default.UniverseWidth, Properties.Settings.Default.UniverseHeight];
+            scratchPad = new bool[Properties.Settings.Default.UniverseWidth, Properties.Settings.Default.UniverseHeight];
+
+            timer.Interval = Properties.Settings.Default.Timer;
+
+            hudShow = Properties.Settings.Default.HUD;
+
+            graphicsPanel1.Invalidate();
+        }
     }
 }
